@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+  {% comment %} Колонки с отступом сверху и снизу {% endcomment %}
+  <div class="row">
+    <h1>Вот что я умею</h1>
+    {% comment %}
+      Боковой блок со списком технологий
+      Займет всю ширину блока на мобильном
+      и 25% при размерах экрана ≥768px
+    {% endcomment %}
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          Python
+        </li>
+        <li class="list-group-item">
+          Django
+        </li>
+      </ul>
+    </aside>
+    {% comment %}
+      Статья
+      Займет всю ширину блока на мобильном
+      и 75% при размерах экрана ≥768px
+    {% endcomment %}
+    <article class="col-12 col-md-9">
+      <p>Текст страницы "Технологии".
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus
+        consequatur corporis dicta dolore error est excepturi hic illo optio
+        quos
+        repellat, saepe sed, sint vel velit veniam, voluptates. Laudantium,
+        nostrum!</p>
+      <p>Aliquam aliquid animi aspernatur delectus, doloremque error esse ex
+        excepturi fugit illum maiores maxime, mollitia quia quibusdam saepe
+        tempore vel, voluptates! Animi error et incidunt molestias placeat
+        quasi
+        tempore temporibus?</p>
+      <p>Earum illum libero minus modi pariatur quasi quos tempora. Ad fugiat
+        mollitia quibusdam quo unde! Cupiditate deleniti dicta distinctio ea
+        earum inventore, iste itaque omnis optio placeat qui quia velit!</p>
+      <p>Dolor dolorum illo omnis pariatur possimus quae recusandae temporibus
+        veniam. Architecto cum delectus error laudantium molestiae molestias
+        nam
+        non pariatur perspiciatis quae quaerat quam quod recusandae temporibus,
+        totam vero, voluptas.</p>
+      <p>Alias, aliquam consequatur, corporis culpa cum delectus deleniti ea
+        eum
+        exercitationem impedit ipsum libero numquam obcaecati odit quae quis
+        repellat repellendus sit vel, voluptatum. Aspernatur esse odit quae
+        quia
+        quidem.</p></p>
+    </article>
+  </div>
+{% endblock %} 
