@@ -111,8 +111,8 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     user = get_object_or_404(User, username=request.user)
-    following = user.follower.all().values_list('author', flat=True)
-    post_list = Post.objects.filter(author_id__in=following)
+    author = user.follower.all().values_list('author', flat=True)
+    post_list = Post.objects.filter(author_id__in=author)
     p = Paginator(post_list, NUMBER_OF_POSTS)
     page_num = request.GET.get('page')
     page_obj = p.get_page(page_num)
@@ -127,7 +127,9 @@ def profile_follow(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
     if user != author:
-        Follow.objects.create(user=user, author=author)
+        follow_list = author.following.all().values_list('user', flat=True)
+        if user.pk not in follow_list:
+            Follow.objects.create(user=user, author=author)
     return redirect('posts:profile', username)
 
 

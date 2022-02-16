@@ -224,12 +224,20 @@ class PostPagesTest(TestCase):
 
     def test_unable_follow_yourself(self):
         count_follow = Follow.objects.count()
-        print(count_follow)
         self.authorized_client.get(
             reverse('posts:profile_follow',
                     kwargs={'username': self.user.username}))
+        self.assertEqual(Follow.objects.count(), count_follow)
+
+    def test_once_follow_per_user(self):
+        self.follow_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
         count_follow = Follow.objects.count()
-        print(count_follow)
+        self.follow_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
+        self.assertEqual(Follow.objects.count(), count_follow)
 
 
 class PaginatorViewsTest(TestCase):
