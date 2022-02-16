@@ -225,7 +225,7 @@ class PostPagesTest(TestCase):
     def test_unable_follow_yourself(self):
         count_follow = Follow.objects.count()
         print(count_follow)
-        response = self.authorized_client.get(
+        self.authorized_client.get(
             reverse('posts:profile_follow',
                     kwargs={'username': self.user.username}))
         count_follow = Follow.objects.count()
