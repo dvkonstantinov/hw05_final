@@ -1,7 +1,11 @@
+import shutil
+import tempfile
+
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -16,7 +20,10 @@ PAGES_WITH_POST_LIST = [
     reverse('posts:profile', kwargs={'username': 'user'})
 ]
 
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
+
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostPagesTest(TestCase):
 
     @classmethod
@@ -51,7 +58,6 @@ class PostPagesTest(TestCase):
             author=cls.user,
             group=cls.group,
             text='Тестовый текст',
-            pub_date='11.11.2011',
             image=cls.uploaded
         )
 
@@ -59,6 +65,14 @@ class PostPagesTest(TestCase):
         cls.follow_client = Client()
         cls.authorized_client.force_login(cls.user)
         cls.follow_client.force_login(cls.another_user)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        cache.clear()
 
     def test_pages_uses_correct_template(self):
         reverses = {
@@ -169,7 +183,6 @@ class PostPagesTest(TestCase):
         self.assertEqual(response.context['comments'][0].text, 'ТЕКСТ')
 
     def test_check_index_page_cache(self):
-        cache.clear()
         response = self.authorized_client.get(reverse('posts:index'))
         cached_page = response.content
         self.post = Post.objects.create(
@@ -183,19 +196,28 @@ class PostPagesTest(TestCase):
         response = self.authorized_client.get(reverse('posts:index'))
         self.assertNotEqual(cached_page, response.content)
 
-    def test_user_follow_unfollow(self):
+    def test_user_follow(self):
         response = self.follow_client.get(
             reverse('posts:profile',
                     kwargs={'username': self.user.username}))
         self.assertFalse(response.context['following'])
-        response = self.follow_client.get(
+        self.follow_client.get(
             reverse('posts:profile_follow',
                     kwargs={'username': self.user.username}))
         response = self.follow_client.get(
             reverse('posts:profile',
                     kwargs={'username': self.user.username}))
         self.assertTrue(response.context['following'])
+
+    def test_user_unfollow(self):
+        self.follow_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
         response = self.follow_client.get(
+            reverse('posts:profile',
+                    kwargs={'username': self.user.username}))
+        self.assertTrue(response.context['following'])
+        self.follow_client.get(
             reverse('posts:profile_unfollow',
                     kwargs={'username': self.user.username}))
         response = self.follow_client.get(
@@ -214,7 +236,6 @@ class PostPagesTest(TestCase):
             author=self.user,
             group=self.group,
             text='Новый текст',
-            pub_date='21.11.2011',
             image=self.uploaded
         )
         cache.clear()

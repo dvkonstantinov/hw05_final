@@ -16,7 +16,7 @@ class Post(models.Model):
         verbose_name='Автор'
     )
     group = models.ForeignKey('Group',
-                              related_name='get_posts',
+                              related_name='posts',
                               on_delete=models.SET_NULL,
                               blank=True,
                               null=True,
@@ -50,14 +50,13 @@ class Group(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post,
-                             related_name='get_comments',
+                             related_name='comments',
                              on_delete=models.CASCADE,
-                             null=True,
                              blank=True,
                              )
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
-                               related_name='get_user',
+                               related_name='comments',
                                verbose_name='Автор'
                                )
     text = models.TextField(verbose_name='Текст комментария')
@@ -73,7 +72,16 @@ class Comment(models.Model):
 class Follow(models.Model):
     user = models.ForeignKey(User,
                              related_name='follower',
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             verbose_name='Подписчик')
     author = models.ForeignKey(User,
                                related_name='following',
-                               on_delete=models.CASCADE)
+                               on_delete=models.CASCADE,
+                               verbose_name='На кого подписываются')
+
+    class Meta:
+        db_table = 'posts_follow'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='unique follow')
+        ]
